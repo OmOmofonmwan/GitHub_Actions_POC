@@ -56,9 +56,7 @@ jobs:
     needs: check_if_pr
     if: github.event.inputs.action == 'Start' 
 
-    permissions:
-      contents: write
-      pull-requests: write
+    permissions: write-all
 
     steps:
       - name: If PR Exist
