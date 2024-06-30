@@ -103,7 +103,7 @@ jobs:
           git checkout -b $FEATURE_BRANCH
           mvn versions:set -DnewVersion=${{env.uniqueVersion}} -DgenerateBackupPoms=false
           git commit -am "Draft: Update feature version to ${{env.uniqueVersion}}"
-          git pull 
+          git pull origin main
           git push -u origin $FEATURE_BRANCH
 
       - name: Create PR 
