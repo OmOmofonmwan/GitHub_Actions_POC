@@ -1,4 +1,4 @@
-name: Feature Branch Pipeline
+name: Feature Branch Workflow
 
 run-name: "Feature Branch CI -- ${{github.event.inputs.action}} Action - feature/${{github.event.inputs.feature_branch}} "
 
@@ -103,6 +103,7 @@ jobs:
           git checkout -b $FEATURE_BRANCH
           mvn versions:set -DnewVersion=${{env.uniqueVersion}} -DgenerateBackupPoms=false
           git commit -am "Draft: Update feature version to ${{env.uniqueVersion}}"
+          git pull 
           git push -u origin $FEATURE_BRANCH
 
       - name: Create PR 
