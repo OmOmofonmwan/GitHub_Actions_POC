@@ -115,7 +115,7 @@ jobs:
               -H "Authorization: Bearer ${{secrets.GITHUB_TOKEN}}" \
               -H "X-GitHub-Api-Version: 2022-11-28" \
              https://api.github.com/repos/${{github.repository}}/pulls \
-          -d '{"title":"Draft - ${{env.FEATURE_BRANCH}}","body":"Draft","head":"${{env.TRUNK_BRANCH}}","base":"${{env.FEATURE_BRANCH}}"}'
+          -d '{"title":"Draft - ${{env.FEATURE_BRANCH}}","body":"Draft","head":"${{env.FEATURE_BRANCH}}","base":"${{env.TRUNK_BRANCH}}"}'
 
   resume_action:
     runs-on: ubuntu-latest
