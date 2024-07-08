@@ -1,13 +1,30 @@
+<<<<<<< HEAD
 name: Release Pipeline
+=======
+name: Release Workflow
+>>>>>>> 34c9efdd2ed1275b7d4b3ea5db8865a58f4ae2e9
 
 run-name: "Releasing ${{ github.event.repository.name }} #${{github.run_number}}"
 
 on:
     workflow_dispatch:
+<<<<<<< HEAD
+=======
+      inputs:
+        release_message:
+          type: string
+          description: "(Optional) Enter Release Message"
+
+env:
+  BRANCH_NAME: ${{github.ref_name}}
+  TRUNK_BRANCH_NAME: main
+  RELEASE_MESSAGE: ${{github.event.inputs.release_message}}
+>>>>>>> 34c9efdd2ed1275b7d4b3ea5db8865a58f4ae2e9
 
 jobs:
     initialization:
         runs-on: ubuntu-latest
+<<<<<<< HEAD
         if: github.ref == 'refs/heads/main' || github.ref_name == 'refs/heads/master'
         outputs:
             SNAPSHOT_VERSION: ${{steps.newSnapshotVersion.outputs.SnapshotVersion}}
@@ -15,19 +32,39 @@ jobs:
         env:
             SNAPSHOTVERSION: ""
         steps:
+=======
+        name: Initialization
+        outputs:
+            NEXT_SNAPSHOT_VERSION: ${{steps.nextSnapshotVersion.outputs.SnapshotVersion}}
+            RELEASE_VERSION: ${{steps.splitCurrentVersion.outputs._0}}
+        steps:
+            - name: Verify Branch
+              if: env.BRANCH_NAME != env.TRUNK_BRANCH_NAME
+              run: |
+                echo "ERROR: Attempting to release from branch ${{env.BRANCH_NAME}}. Release from ${{env.TRUNK_BRANCH_NAME}} branch only"
+                exit 1
+>>>>>>> 34c9efdd2ed1275b7d4b3ea5db8865a58f4ae2e9
             - name: Checkout Code Repository
               uses: actions/checkout@v4
             - name: Downloading Java
               uses: actions/setup-java@v4
               with:
+<<<<<<< HEAD
                 java-version: '11'
                 distribution: 'temurin'
             - name: Get Current Version
+=======
+                java-version: '21'
+                distribution: 'adopt'
+            - name: Get Current Version
+              id: getCurrentVersion
+>>>>>>> 34c9efdd2ed1275b7d4b3ea5db8865a58f4ae2e9
               run: |
                 echo "POM_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
             - name: Print Version
               run: echo ${{env.POM_VERSION}}
             - name: Verify Is SNAPSHOT Version
+<<<<<<< HEAD
               if: ${{ !contains(env.POM_VERSION, '-SNAPSHOT')}}
               run: | 
                 echo "ERROR: Version is set to incompatible version ${{env.POM_VERSION}}. Only SNAPSHOT development versions can be converted to a release version."
@@ -35,10 +72,20 @@ jobs:
             - name: Split version code
               uses: xom9ikk/split@v1
               id: splitVersion
+=======
+              if: ${{!contains(env.POM_VERSION, '-SNAPSHOT')}}
+              run: | 
+                echo "ERROR: Version is set to incompatible version ${{env.POM_VERSION}}. Only SNAPSHOT development versions can be converted to a release version."
+                exit 1
+            - name: Split version code - Remove SNAPSHOT Word
+              uses: xom9ikk/split@v1
+              id: splitCurrentVersion
+>>>>>>> 34c9efdd2ed1275b7d4b3ea5db8865a58f4ae2e9
               with:
                   string: ${{env.POM_VERSION}}
                   separator: -SNAPSHOT
                   limit: -1
+<<<<<<< HEAD
             - name: Split version code - Minor
               uses: xom9ikk/split@v1
               id: splitVersionMinor
@@ -54,10 +101,33 @@ jobs:
               run: |
                 echo " Snapshot Version -- ${{steps.newSnapshotVersion.outputs.SnapshotVersion}}"
                 echo " Release Version -- ${{steps.splitVersion.outputs._0}}"
+=======
+            - name: Split version code - Seperate By . 
+              uses: xom9ikk/split@v1
+              id: splitVersionMinor
+              with:
+                string: ${{steps.splitCurrentVersion.outputs._0}}
+                separator: .
+                limit: -1
+            - name: Increment Snapshot Version
+              id: nextSnapshotVersion
+              run: |
+                echo "SnapshotVersion=${{steps.splitVersionMinor.outputs._0}}.$((${{steps.splitVersionMinor.outputs._1}} + 1)).${{steps.splitVersionMinor.outputs._2}}-SNAPSHOT" >> $GITHUB_OUTPUT
+            - name: Print Information
+              run: |
+                echo "Release Version -- ${{steps.splitCurrentVersion.outputs._0}}"
+                echo "Snapshot Version -- ${{steps.nextSnapshotVersion.outputs.SnapshotVersion}}"
+                echo "Branch Name -- ${{env.BRANCH_NAME}}"
+                
+>>>>>>> 34c9efdd2ed1275b7d4b3ea5db8865a58f4ae2e9
     
     set_build_and_tag_release:
         runs-on: ubuntu-latest
         needs: initialization
+<<<<<<< HEAD
+=======
+        name: Set, Build & Tag Release Version
+>>>>>>> 34c9efdd2ed1275b7d4b3ea5db8865a58f4ae2e9
         permissions:
           contents: write
         steps:
@@ -67,11 +137,32 @@ jobs:
               uses: actions/setup-java@v4
               with:
                 java-version: '21'
+<<<<<<< HEAD
                 distribution: 'temurin'
             - name: Set Release Version
               run: mvn -B versions:set -DnewVersion=${{needs.initialization.outputs.RELEASE_VERSION}} -DgenerateBackupPoms=false
             - name: Build Release Version
               run: mvn -version mvn clean install
+=======
+                distribution: 'adopt'
+            - name: Set Release Version
+              run: |
+                mvn -B versions:set \
+                 -DnewVersion=${{needs.initialization.outputs.RELEASE_VERSION}} \
+                 -DgenerateBackupPoms=false
+            # - name: Build Release Version
+            #   run: | 
+            #     mvn -version 
+            #     mvn clean install \
+            #      --batch-mode \
+            #      -e \
+            #      -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+            #      -PcodeQuality,release-enforcement
+            - name: Build Release Version
+              run: | 
+                mvn -version 
+                mvn clean install
+>>>>>>> 34c9efdd2ed1275b7d4b3ea5db8865a58f4ae2e9
             - name: Create tag
               uses: actions/github-script@v5
               with:
@@ -85,6 +176,10 @@ jobs:
             
     set_next_dev:
           runs-on: ubuntu-latest
+<<<<<<< HEAD
+=======
+          name: Set Next Development Version
+>>>>>>> 34c9efdd2ed1275b7d4b3ea5db8865a58f4ae2e9
           needs: 
             - initialization
             - set_build_and_tag_release
@@ -97,15 +192,28 @@ jobs:
               uses: actions/setup-java@v4
               with:
                 java-version: '21'
+<<<<<<< HEAD
                 distribution: 'temurin'
             - name: Set Dev Version
               run: mvn -B versions:set -DnewVersion=${{needs.initialization.outputs.SNAPSHOT_VERSION}} -DgenerateBackupPoms=false
+=======
+                distribution: 'adopt'
+            - name: Set Dev Version
+              run: |
+                  mvn -B versions:set \
+                  -DnewVersion=${{needs.initialization.outputs.NEXT_SNAPSHOT_VERSION}} \
+                   -DgenerateBackupPoms=false
+>>>>>>> 34c9efdd2ed1275b7d4b3ea5db8865a58f4ae2e9
             - name: Commit & Push
               run: |
                 git add .
                 git config user.name fda_shield_omoruyi
                 git config user.email oomofonmwan93@gmail.com
+<<<<<<< HEAD
                 git commit -m 'Set next dev version to ${{needs.initialization.outputs.SNAPSHOT_VERSION}}'
+=======
+                git commit -m 'Set next dev version to ${{needs.initialization.outputs.NEXT_SNAPSHOT_VERSION}}'
+>>>>>>> 34c9efdd2ed1275b7d4b3ea5db8865a58f4ae2e9
                 git push origin HEAD:main
                 git push --tags origin 
 
@@ -114,23 +222,40 @@ jobs:
       permissions: write-all
       needs: 
         - initialization
+<<<<<<< HEAD
         - set_build_and_tag_release
+=======
+>>>>>>> 34c9efdd2ed1275b7d4b3ea5db8865a58f4ae2e9
         - set_next_dev
       runs-on: ubuntu-latest
       steps:
             - name: Checkout code
               uses: actions/checkout@master
+<<<<<<< HEAD
+=======
+            - name: Modify Release Message
+              if: env.RELEASE_MESSAGE == ''
+              run: echo "RELEASE_MESSAGE=Release ${{needs.initialization.outputs.RELEASE_VERSION}}" >> $GITHUB_ENV
+>>>>>>> 34c9efdd2ed1275b7d4b3ea5db8865a58f4ae2e9
             - name: Create Release
               id: create_release
               uses: actions/create-release@latest
               env:
+<<<<<<< HEAD
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+=======
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+>>>>>>> 34c9efdd2ed1275b7d4b3ea5db8865a58f4ae2e9
               with:
                 tag_name: ${{needs.initialization.outputs.RELEASE_VERSION}}
                 release_name: Release ${{needs.initialization.outputs.RELEASE_VERSION}}
                 body: |
+<<<<<<< HEAD
                   Changes in this Release
                   - First Change
                   - Second Change
+=======
+                  ${{env.RELEASE_MESSAGE}}
+>>>>>>> 34c9efdd2ed1275b7d4b3ea5db8865a58f4ae2e9
                 draft: false
                 prerelease: false
