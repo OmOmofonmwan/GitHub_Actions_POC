@@ -88,7 +88,7 @@ jobs:
     call_release_workflow_with_custom_inputs:
        needs: get_custom_inputs
        name: Call Release Workflow With Custom Inputs
-       uses: OmOmofonmwan/GitHub-Actions-POC/.github/workflows/reusable_release_poc.yaml@main
+       uses: OmOmofonmwan/GitHub_Actions_POC/.github/workflows/reusable_release_poc.yaml@main
        permissions: write-all
        secrets: inherit
        with:
@@ -157,7 +157,7 @@ jobs:
 
     call_release_workflow_incremented_version:
        needs: increment_version
-       uses: OmOmofonmwan/GitHub-Actions-POC/.github/workflows/reusable_release_poc.yaml@main
+       uses: OmOmofonmwan/GitHub_Actions_POC/.github/workflows/reusable_release_poc.yaml@main
        name: Call Release Workflow With Incremented Version
        permissions: write-all
        secrets: inherit
