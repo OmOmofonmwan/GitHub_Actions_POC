@@ -88,7 +88,7 @@ jobs:
     call_release_workflow_with_custom_inputs:
        needs: get_custom_inputs
        name: Call Release Workflow With Custom Inputs
-       uses: ikmdev/build-parent/.github/workflows/reusable_release_workflow.yaml@main
+       uses: OmOmofonmwan/GitHub-Actions-POC/.github/workflows/reusable_release_poc.yaml@main
        permissions: write-all
        secrets: inherit
        with:
@@ -156,9 +156,8 @@ jobs:
                echo "Release Version: ${{needs.get_major_minor_patch_inputs.outputs.RELEASE_VERSION}}"
 
     call_release_workflow_incremented_version:
-       needs: 
-        - increment_version
-       uses: ikmdev/build-parent/.github/workflows/reusable_release_workflow.yaml@main
+       needs: increment_version
+       uses: OmOmofonmwan/GitHub-Actions-POC/.github/workflows/reusable_release_poc.yaml@main
        name: Call Release Workflow With Incremented Version
        permissions: write-all
        secrets: inherit
